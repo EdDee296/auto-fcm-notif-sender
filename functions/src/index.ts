@@ -17,16 +17,16 @@ exports.myfunction = onDocumentWritten("notifications/{deviceToken}", async (eve
     return;
   }
 
-  const { title, msg, eventID } = data;
+  const { title, msg, eventId } = data;
 
-  if (!eventID) {
-    console.error("No eventID found in the notification document.");
+  if (!eventId) {
+    console.error("No eventId found in the notification document.");
     return;
   }
 
   try {
     const response = await getMessaging().send({
-      topic: eventID,
+      topic: eventId,
       notification: {
         title: title || "Default Title",
         body: msg || "Default Message",
