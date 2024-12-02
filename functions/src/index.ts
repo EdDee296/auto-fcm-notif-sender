@@ -12,6 +12,8 @@ exports.myfunction = onDocumentWritten("notifications/{deviceToken}", async (eve
   }
 
   const data = event.data.after.data();
+  const deviceToken = event.params.deviceToken; // Get the document name as deviceToken
+
   if (!data) {
     console.error("No data found in the document.");
     return;
@@ -25,6 +27,11 @@ exports.myfunction = onDocumentWritten("notifications/{deviceToken}", async (eve
   }
 
   try {
+    // Subscribe the device token to the topic
+    await getMessaging().subscribeToTopic([deviceToken], eventId);
+    console.log(`Successfully subscribed device ${deviceToken} to topic ${eventId}.`);
+
+    // Send a notification to the topic
     const response = await getMessaging().send({
       topic: eventId,
       notification: {
@@ -32,12 +39,14 @@ exports.myfunction = onDocumentWritten("notifications/{deviceToken}", async (eve
         body: msg || "Default Message",
       },
       data: {
+        eventId,
         title: title || "Default Title",
         body: msg || "Default Message",
       },
     });
+
     console.log("Successfully sent message:", response);
   } catch (err) {
-    console.error("Error sending message:", err);
+    console.error("Error subscribing to topic or sending message:", err);
   }
 });
